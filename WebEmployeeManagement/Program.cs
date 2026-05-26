@@ -1,27 +1,21 @@
-using WebEmployeeManagement.Applications.Interfaces;
-using WebEmployeeManagement.Infrastructures.DataAccess;
-using WebEmployeeManagement.Applications.Services;
+using Microsoft.EntityFrameworkCore;
+using WebEmployeeManagement.Applications.Repositories;
+using WebEmployeeManagement.Applications.Service;
+using WebEmployeeManagement.Infrastructures.Context;
 using WebEmployeeManagement.Infrastructures.Repositories;
-using WebEmployeeManagement.Infrastructures.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
-builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
-builder.Services.Configure<Microsoft.AspNetCore.Mvc.Razor.RazorViewEngineOptions>(options =>
-{
-    options.ViewLocationFormats.Clear();
-    options.ViewLocationFormats.Add("/Presentations/Views/{1}/{0}.cshtml");
-    options.ViewLocationFormats.Add("/Presentations/Views/Shared/{0}.cshtml");
-});
-
 var app = builder.Build();
-
-DbAccsess.Initialize();
 
 app.UseStaticFiles();
 app.UseRouting();
